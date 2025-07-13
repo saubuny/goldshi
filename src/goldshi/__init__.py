@@ -1,4 +1,5 @@
-from goldshi.hello import hello
+from goldshi.photo import create_test_ppm
+
 
 def main() -> None:
-    print(hello())
+    create_test_ppm()

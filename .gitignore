@@ -11,3 +11,6 @@ wheels/
 
 # Personal local notes on the project
 notes.txt
+
+# the feh image output
+out
