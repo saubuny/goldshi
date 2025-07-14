@@ -1,5 +1,7 @@
-from goldshi.photo import create_test_ppm
+from goldshi.photo import ppm_to_pixels
 
 
 def main() -> None:
-    create_test_ppm()
+    with open("/home/saubuny/Pictures/goldshi.ppm", "rb") as f:
+        image = f.read()
+        ppm_to_pixels(image)
