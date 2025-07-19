@@ -1,21 +1,23 @@
 from typing import List
 
-# The functions in here would be good to unit test.
-
 
 def ppm_to_pixels(image: bytes) -> List[List[List[float]]]:
-    pixels = [[[]]]  # this looks so dumb LOL
     s = image.split()
-    x, y = int(s[1]), int(s[2])
+    pixels = [
+        [[0.0 for _ in range(3)] for _ in range(int(s[1]))] for _ in range(int(s[2]))
+    ]  # [row][column][channel]
 
-    offset = 4  # this is where pixels start
+    offset = 4  # pixel start
+    row = 0
+    col = 0
     for i in range(offset, len(s), 3):
         for j in range(3):
-            # put in the pixels array !
-            print(int(s[i + j]), end=" ")
-        print()
+            pixels[row][col][j] = float(s[i + j]) / 255
 
-    # x, y = float(s[1]) / 255, float(s[2]) / 255
+        col += 1
+        if col % int(s[1]) == 0:
+            col = 0
+            row += 1
 
     return pixels
 
