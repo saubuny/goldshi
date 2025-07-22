@@ -1,4 +1,4 @@
-from goldshi.photo import ppm_to_pixels
+from goldshi.photo import pixels_to_ppm, ppm_to_pixels
 
 
 def main() -> None:
@@ -6,6 +6,6 @@ def main() -> None:
         image = f.read()
 
         try:
-            ppm_to_pixels(image)
+            pixels_to_ppm(ppm_to_pixels(image))
         except Exception as e:
             print(f"[Error] {e}")

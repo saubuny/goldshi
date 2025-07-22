@@ -1,7 +1,7 @@
 from typing import List
 
 
-def ppm_to_pixels(image: bytes) -> List[List[List[float]]] | str:
+def ppm_to_pixels(image: bytes) -> List[List[List[float]]]:
     s = image.split()
     pixels = [
         [[0.0 for _ in range(3)] for _ in range(int(s[1]))] for _ in range(int(s[2]))
@@ -28,22 +28,12 @@ def ppm_to_pixels(image: bytes) -> List[List[List[float]]] | str:
     return pixels
 
 
-def pixels_to_ppm(pixels: List[List[List[float]]]) -> bytes: ...
+def pixels_to_ppm(pixels: List[List[List[float]]]) -> bytes | None:
+    image = f"P3\n{len(pixels[0])} {len(pixels)}\n255\n"
 
+    for row in pixels:
+        for col in row:
+            for ch in col:
+                image += str(int(ch * 255)) + " "
 
-# Not a very useful function :<
-def create_test_ppm() -> None:
-    f = open("out", "w")
-    f.writelines(
-        [
-            "P3\n",
-            "3 2\n",
-            "255\n",
-            "255   0   0\n",
-            "  0 255   0\n",
-            "  0   0 255\n",
-            "255 255   0\n",
-            "255 255 255\n",
-            "  0   0   0\n",
-        ]
-    )
+    return image.encode("utf-8")
