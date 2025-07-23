@@ -1,6 +1,17 @@
 from typing import List
 
 
+# Linear approximation of gamma and perceptual luminance corrected
+def grayscale_pixels(pixels: List[List[List[float]]]) -> List[List[List[float]]]:
+    for row in pixels:
+        for col in row:
+            average = (col[0] * 0.299) + (col[1] * 0.587) + (col[2] * 0.114)
+            col[0] = average
+            col[1] = average
+            col[2] = average
+    return pixels
+
+
 def ppm_to_pixels(image: bytes) -> List[List[List[float]]]:
     s = image.split()
     pixels = [
@@ -28,12 +39,13 @@ def ppm_to_pixels(image: bytes) -> List[List[List[float]]]:
     return pixels
 
 
-def pixels_to_ppm(pixels: List[List[List[float]]]) -> bytes | None:
+def pixels_to_ppm(pixels: List[List[List[float]]]) -> bytes:
     image = f"P3\n{len(pixels[0])} {len(pixels)}\n255\n"
 
     for row in pixels:
         for col in row:
             for ch in col:
                 image += str(int(ch * 255)) + " "
+        image += "\n"
 
     return image.encode("utf-8")
