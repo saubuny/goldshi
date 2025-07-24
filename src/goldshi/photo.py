@@ -1,5 +1,7 @@
 from typing import List
 
+from goldshi.helper import clamp
+
 type pixels = List[List[List[float]]]
 
 
@@ -67,6 +69,15 @@ def grayscale(pixels: pixels) -> pixels:
             col[0] = average
             col[1] = average
             col[2] = average
+    return pixels
+
+
+def brightness(pixels: pixels, change: float) -> pixels:
+    for row in pixels:
+        for col in row:
+            col[0] = clamp(col[0] * change, 0, 1)
+            col[1] = clamp(col[1] * change, 0, 1)
+            col[2] = clamp(col[2] * change, 0, 1)
     return pixels
 
 

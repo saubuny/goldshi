@@ -7,7 +7,7 @@
 * [x] Blur
 * [ ] Color Manipulation
     * [x] Grayscale
-    * [ ] Brightness
+    * [x] Brightness
     * [ ] Contrast
     * [ ] Saturation
 * [ ] Captions
