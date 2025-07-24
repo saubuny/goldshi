@@ -3,8 +3,8 @@
 ## Planned features
 * [ ] Support for more image formats than PPM
 * [ ] Resizing
-* [ ] Blur
 * [ ] Mirror
+* [x] Blur
 * [ ] Color Manipulation
     * [x] Grayscale
     * [ ] Brightness
