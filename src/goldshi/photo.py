@@ -1,8 +1,66 @@
 from typing import List
 
+type pixels = List[List[List[float]]]
+
+
+# gaussian blur too complex for my tiny little brain
+# outer ring of pixels are left unchanged
+def box_blur(pixels: pixels, passes: int = 3) -> pixels:
+    for _ in range(passes):
+        for row in range(len(pixels)):
+            for col in range(len(pixels[row])):
+                if (
+                    row < 1
+                    or col < 1
+                    or row + 1 >= len(pixels)
+                    or col + 1 >= len(pixels[col])
+                ):
+                    continue
+
+                sum_red = (
+                    pixels[row - 1][col + 1][0]
+                    + pixels[row + 0][col + 1][0]
+                    + pixels[row + 1][col + 1][0]
+                    + pixels[row - 1][col + 0][0]
+                    + pixels[row + 0][col + 0][0]
+                    + pixels[row + 1][col + 0][0]
+                    + pixels[row - 1][col - 1][0]
+                    + pixels[row + 0][col - 1][0]
+                    + pixels[row + 1][col - 1][0]
+                )
+                pixels[row][col][0] = sum_red / 9
+
+                sum_green = (
+                    pixels[row - 1][col + 1][1]
+                    + pixels[row + 0][col + 1][1]
+                    + pixels[row + 1][col + 1][1]
+                    + pixels[row - 1][col + 0][1]
+                    + pixels[row + 0][col + 0][1]
+                    + pixels[row + 1][col + 0][1]
+                    + pixels[row - 1][col - 1][1]
+                    + pixels[row + 0][col - 1][1]
+                    + pixels[row + 1][col - 1][1]
+                )
+                pixels[row][col][1] = sum_green / 9
+
+                sum_blue = (
+                    pixels[row - 1][col + 1][2]
+                    + pixels[row + 0][col + 1][2]
+                    + pixels[row + 1][col + 1][2]
+                    + pixels[row - 1][col + 0][2]
+                    + pixels[row + 0][col + 0][2]
+                    + pixels[row + 1][col + 0][2]
+                    + pixels[row - 1][col - 1][2]
+                    + pixels[row + 0][col - 1][2]
+                    + pixels[row + 1][col - 1][2]
+                )
+                pixels[row][col][2] = sum_blue / 9
+
+    return pixels
+
 
 # Linear approximation of gamma and perceptual luminance corrected
-def grayscale_pixels(pixels: List[List[List[float]]]) -> List[List[List[float]]]:
+def grayscale(pixels: pixels) -> pixels:
     for row in pixels:
         for col in row:
             average = (col[0] * 0.299) + (col[1] * 0.587) + (col[2] * 0.114)
@@ -12,7 +70,7 @@ def grayscale_pixels(pixels: List[List[List[float]]]) -> List[List[List[float]]]
     return pixels
 
 
-def ppm_to_pixels(image: bytes) -> List[List[List[float]]]:
+def ppm_to_pixels(image: bytes) -> pixels:
     s = image.split()
     pixels = [
         [[0.0 for _ in range(3)] for _ in range(int(s[1]))] for _ in range(int(s[2]))
@@ -39,7 +97,7 @@ def ppm_to_pixels(image: bytes) -> List[List[List[float]]]:
     return pixels
 
 
-def pixels_to_ppm(pixels: List[List[List[float]]]) -> bytes:
+def pixels_to_ppm(pixels: pixels) -> bytes:
     image = f"P3\n{len(pixels[0])} {len(pixels)}\n255\n"
 
     for row in pixels:

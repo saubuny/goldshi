@@ -1,4 +1,4 @@
-from goldshi.photo import grayscale_pixels, pixels_to_ppm, ppm_to_pixels
+from goldshi.photo import box_blur, pixels_to_ppm, ppm_to_pixels
 
 
 def main() -> None:
@@ -6,7 +6,7 @@ def main() -> None:
         image = f.read()
 
         try:
-            output = pixels_to_ppm(grayscale_pixels(ppm_to_pixels(image)))
+            output = pixels_to_ppm(box_blur(ppm_to_pixels(image)))
             with open("out", "wb") as out:
                 out.write(output)
         except Exception as e:
