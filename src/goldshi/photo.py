@@ -4,11 +4,16 @@ from goldshi.helper import clamp
 
 type pixels = List[List[List[float]]]
 
+VERBOSE = True
+
 
 # gaussian blur too complex for my tiny little brain
 # outer ring of pixels are left unchanged
+# slow as FUCK
 def box_blur(pixels: pixels, passes: int = 3) -> pixels:
-    for _ in range(passes):
+    for p in range(passes):
+        if VERBOSE:
+            print(f"[INFO] Starting blur pass {p}")
         for row in range(len(pixels)):
             for col in range(len(pixels[row])):
                 if (
@@ -19,45 +24,19 @@ def box_blur(pixels: pixels, passes: int = 3) -> pixels:
                 ):
                     continue
 
-                sum_red = (
-                    pixels[row - 1][col + 1][0]
-                    + pixels[row + 0][col + 1][0]
-                    + pixels[row + 1][col + 1][0]
-                    + pixels[row - 1][col + 0][0]
-                    + pixels[row + 0][col + 0][0]
-                    + pixels[row + 1][col + 0][0]
-                    + pixels[row - 1][col - 1][0]
-                    + pixels[row + 0][col - 1][0]
-                    + pixels[row + 1][col - 1][0]
-                )
-                pixels[row][col][0] = sum_red / 9
-
-                sum_green = (
-                    pixels[row - 1][col + 1][1]
-                    + pixels[row + 0][col + 1][1]
-                    + pixels[row + 1][col + 1][1]
-                    + pixels[row - 1][col + 0][1]
-                    + pixels[row + 0][col + 0][1]
-                    + pixels[row + 1][col + 0][1]
-                    + pixels[row - 1][col - 1][1]
-                    + pixels[row + 0][col - 1][1]
-                    + pixels[row + 1][col - 1][1]
-                )
-                pixels[row][col][1] = sum_green / 9
-
-                sum_blue = (
-                    pixels[row - 1][col + 1][2]
-                    + pixels[row + 0][col + 1][2]
-                    + pixels[row + 1][col + 1][2]
-                    + pixels[row - 1][col + 0][2]
-                    + pixels[row + 0][col + 0][2]
-                    + pixels[row + 1][col + 0][2]
-                    + pixels[row - 1][col - 1][2]
-                    + pixels[row + 0][col - 1][2]
-                    + pixels[row + 1][col - 1][2]
-                )
-                pixels[row][col][2] = sum_blue / 9
-
+                for c in range(3):
+                    sum = (
+                        pixels[row - 1][col + 1][c]
+                        + pixels[row + 0][col + 1][c]
+                        + pixels[row + 1][col + 1][c]
+                        + pixels[row - 1][col + 0][c]
+                        + pixels[row + 0][col + 0][c]
+                        + pixels[row + 1][col + 0][c]
+                        + pixels[row - 1][col - 1][c]
+                        + pixels[row + 0][col - 1][c]
+                        + pixels[row + 1][col - 1][c]
+                    )
+                    pixels[row][col][c] = sum / 9
     return pixels
 
 
@@ -79,6 +58,13 @@ def brightness(pixels: pixels, change: float) -> pixels:
             col[1] = clamp(col[1] * change, 0, 1)
             col[2] = clamp(col[2] * change, 0, 1)
     return pixels
+
+
+# histogram equalization
+def contrast(pixels: pixels) -> pixels: ...
+
+
+def rgb_to_YCbCr(pixels: pixels) -> pixels: ...
 
 
 def ppm_to_pixels(image: bytes) -> pixels:
