@@ -2,18 +2,21 @@ from typing import List
 
 from goldshi.helper import clamp
 
-type pixels = List[List[List[float]]]
+# probably better to make a stricter format where the innermost list is a named tuple for rgb/ycbcr
+type Pixels = List[List[List[float]]]
 
-VERBOSE = True
+
+def newPixels(row, col) -> Pixels:
+    return [
+        [[0.0 for _ in range(3)] for _ in range(int(col))] for _ in range(int(row))
+    ]  # [row][column][channel]
 
 
 # gaussian blur too complex for my tiny little brain
 # outer ring of pixels are left unchanged
 # slow as FUCK
-def box_blur(pixels: pixels, passes: int = 3) -> pixels:
+def box_blur(pixels: Pixels, passes: int = 3) -> Pixels:
     for p in range(passes):
-        if VERBOSE:
-            print(f"[INFO] Starting blur pass {p}")
         for row in range(len(pixels)):
             for col in range(len(pixels[row])):
                 if (
@@ -41,7 +44,7 @@ def box_blur(pixels: pixels, passes: int = 3) -> pixels:
 
 
 # Linear approximation of gamma and perceptual luminance corrected
-def grayscale(pixels: pixels) -> pixels:
+def grayscale(pixels: Pixels) -> Pixels:
     for row in pixels:
         for col in row:
             average = (col[0] * 0.299) + (col[1] * 0.587) + (col[2] * 0.114)
@@ -51,7 +54,7 @@ def grayscale(pixels: pixels) -> pixels:
     return pixels
 
 
-def brightness(pixels: pixels, change: float) -> pixels:
+def brightness(pixels: Pixels, change: float) -> Pixels:
     for row in pixels:
         for col in row:
             col[0] = clamp(col[0] * change, 0, 1)
@@ -61,17 +64,49 @@ def brightness(pixels: pixels, change: float) -> pixels:
 
 
 # histogram equalization
-def contrast(pixels: pixels) -> pixels: ...
+def contrast(pixels: Pixels) -> Pixels: ...
 
 
-def rgb_to_YCbCr(pixels: pixels) -> pixels: ...
+# https://en.wikipedia.org/wiki/YCbCr#JPEG_conversion
+def rgb_to_YCbCr(pixels: Pixels) -> Pixels:
+    new_pixels = newPixels(len(pixels), len(pixels[0]))
+    for row in range(len(pixels)):
+        for col in range(len(pixels[row])):
+            r = pixels[row][col][0]
+            g = pixels[row][col][1]
+            b = pixels[row][col][2]
+
+            y = (0.299 * r) + (0.587 * g) + (0.114 * b)
+            cb = 128 - (0.168736 * r) - (0.331264 * g) + (0.5 * b)
+            cr = 128 + (0.5 * r) - (0.418688 * g) - (0.081312 * b)
+
+            new_pixels[row][col][0] = y
+            new_pixels[row][col][1] = cb
+            new_pixels[row][col][2] = cr
+    return pixels
 
 
-def ppm_to_pixels(image: bytes) -> pixels:
+def YCbCr_to_rgb(pixels: Pixels) -> Pixels:
+    new_pixels = newPixels(len(pixels), len(pixels[0]))
+    for row in range(len(pixels)):
+        for col in range(len(pixels[row])):
+            y = pixels[row][col][0]
+            cb = pixels[row][col][1]
+            cr = pixels[row][col][2]
+
+            r = y + 1.402 * (cr - 128)
+            g = y - 0.344136 * (cb - 128) - 0.714136 * (cr - 128)
+            b = y + 1.772 * (cb - 128)
+
+            new_pixels[row][col][0] = r
+            new_pixels[row][col][1] = g
+            new_pixels[row][col][2] = b
+    return pixels
+
+
+def ppm_to_pixels(image: bytes) -> Pixels:
     s = image.split()
-    pixels = [
-        [[0.0 for _ in range(3)] for _ in range(int(s[1]))] for _ in range(int(s[2]))
-    ]  # [row][column][channel]
+    pixels = newPixels(s[2], s[1])
 
     if s[0] != b"P3":
         raise Exception("Only the P3 format is supported")
@@ -94,7 +129,7 @@ def ppm_to_pixels(image: bytes) -> pixels:
     return pixels
 
 
-def pixels_to_ppm(pixels: pixels) -> bytes:
+def pixels_to_ppm(pixels: Pixels) -> bytes:
     image = f"P3\n{len(pixels[0])} {len(pixels)}\n255\n"
 
     for row in pixels:
