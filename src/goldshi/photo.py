@@ -63,23 +63,25 @@ def brightness(pixels: Pixels, change: float) -> Pixels:
     return pixels
 
 
-# min-max stretching, as i'm literally too stupid to understand histogram equilization right now
-# DOES NOT WORK
-def contrast(pixels: Pixels) -> Pixels:
-    min = pixels[0][0][0]
-    max = pixels[0][0][0]
+# percentile stretching
+def contrast(pixels: Pixels, factor: float = 1) -> Pixels:
+    y_values = []
     for row in pixels:
         for col in row:
-            if col[0] < min:
-                min = col[0]
-            if col[0] > max:
-                max = col[0]
+            y_values.append(col[0])
+    min = y_values[percentile(2, y_values)]
+    max = y_values[percentile(98, y_values)]
 
     for row in range(len(pixels)):
         for col in range(len(pixels[row])):
-            pixels[row][col][0] = (pixels[row][col][0] - min) / (max - min)
+            pixels[row][col][0] = (pixels[row][col][0] - min) / (max - min) * factor
 
     return pixels
+
+
+def percentile(percentile: int, pixels: list) -> int:
+    pixels.sort()
+    return int((percentile / 100) * (len(pixels) - 1))
 
 
 # https://en.wikipedia.org/wiki/YCbCr#JPEG_conversion
@@ -95,9 +97,9 @@ def rgb_to_YCbCr(pixels: Pixels) -> Pixels:
             cb = 128 - (0.168736 * r) - (0.331264 * g) + (0.5 * b)
             cr = 128 + (0.5 * r) - (0.418688 * g) - (0.081312 * b)
 
-            new_pixels[row][col][0] = y
-            new_pixels[row][col][1] = cb
-            new_pixels[row][col][2] = cr
+            new_pixels[row][col][0] = clamp(y, 0, 1)
+            new_pixels[row][col][1] = clamp(cb, 127.5, 128.5)
+            new_pixels[row][col][2] = clamp(cr, 127.5, 128.5)
     return new_pixels
 
 
@@ -113,9 +115,9 @@ def YCbCr_to_rgb(pixels: Pixels) -> Pixels:
             g = y - 0.344136 * (cb - 128) - 0.714136 * (cr - 128)
             b = y + 1.772 * (cb - 128)
 
-            new_pixels[row][col][0] = r
-            new_pixels[row][col][1] = g
-            new_pixels[row][col][2] = b
+            new_pixels[row][col][0] = clamp(r, 0, 1)
+            new_pixels[row][col][1] = clamp(g, 0, 1)
+            new_pixels[row][col][2] = clamp(b, 0, 1)
     return new_pixels
 
 
@@ -131,8 +133,8 @@ def ppm_to_pixels(image: bytes) -> Pixels:
     col = 0
     for i in range(offset, len(s), 3):
         for j in range(3):
-            if int(s[i + j]) < 0 or int(s[i + j]) > int(s[3]):  # invalid rgb value
-                raise Exception("Invalid PPM file given")
+            if int(s[i + j]) < 0 or int(s[i + j]) > int(s[3]):
+                raise Exception("Invalid RGB values in PPM file given")
 
             pixels[row][col][j] = float(s[i + j]) / 255
 
@@ -150,6 +152,8 @@ def pixels_to_ppm(pixels: Pixels) -> bytes:
     for row in pixels:
         for col in row:
             for ch in col:
+                if ch < 0 or ch > 255:
+                    raise Exception("Invalid RGB values")
                 image += str(int(ch * 255)) + " "
         image += "\n"
 

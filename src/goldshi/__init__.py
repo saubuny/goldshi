@@ -1,6 +1,7 @@
 from goldshi.photo import (
     YCbCr_to_rgb,
     contrast,
+    grayscale,
     pixels_to_ppm,
     ppm_to_pixels,
     rgb_to_YCbCr,
@@ -8,7 +9,7 @@ from goldshi.photo import (
 
 
 def main() -> None:
-    with open("/home/saubuny/Pictures/ppm/tree.ppm", "rb") as f:
+    with open("/home/saubuny/Pictures/ppm/goldshi.ppm", "rb") as f:
         image = f.read()
 
         try:
