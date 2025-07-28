@@ -2,7 +2,6 @@ from typing import List
 
 from goldshi.helper import clamp
 
-# probably better to make a stricter format where the innermost list is a named tuple for rgb/ycbcr
 type Pixels = List[List[List[float]]]
 
 
@@ -14,7 +13,6 @@ def new_Pixels(row, col) -> Pixels:
 
 # gaussian blur too complex for my tiny little brain
 # outer ring of pixels are left unchanged
-# slow as FUCK
 def box_blur(pixels: Pixels, passes: int = 3) -> Pixels:
     for _ in range(passes):
         for row in range(len(pixels)):
