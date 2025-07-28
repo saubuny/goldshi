@@ -9,7 +9,6 @@
     * [x] Grayscale
     * [x] Brightness
     * [ ] Contrast
-    * [ ] Saturation
 
 ## Why
 This is simply a project to get me back into programming after a long hiatus. I wanted something fun, sizeable, and that I might actually use occasionally.

@@ -6,7 +6,7 @@ from goldshi.helper import clamp
 type Pixels = List[List[List[float]]]
 
 
-def newPixels(row, col) -> Pixels:
+def new_Pixels(row, col) -> Pixels:
     return [
         [[0.0 for _ in range(3)] for _ in range(int(col))] for _ in range(int(row))
     ]  # [row][column][channel]
@@ -16,7 +16,7 @@ def newPixels(row, col) -> Pixels:
 # outer ring of pixels are left unchanged
 # slow as FUCK
 def box_blur(pixels: Pixels, passes: int = 3) -> Pixels:
-    for p in range(passes):
+    for _ in range(passes):
         for row in range(len(pixels)):
             for col in range(len(pixels[row])):
                 if (
@@ -63,13 +63,28 @@ def brightness(pixels: Pixels, change: float) -> Pixels:
     return pixels
 
 
-# histogram equalization
-def contrast(pixels: Pixels) -> Pixels: ...
+# min-max stretching, as i'm literally too stupid to understand histogram equilization right now
+# DOES NOT WORK
+def contrast(pixels: Pixels) -> Pixels:
+    min = pixels[0][0][0]
+    max = pixels[0][0][0]
+    for row in pixels:
+        for col in row:
+            if col[0] < min:
+                min = col[0]
+            if col[0] > max:
+                max = col[0]
+
+    for row in range(len(pixels)):
+        for col in range(len(pixels[row])):
+            pixels[row][col][0] = (pixels[row][col][0] - min) / (max - min)
+
+    return pixels
 
 
 # https://en.wikipedia.org/wiki/YCbCr#JPEG_conversion
 def rgb_to_YCbCr(pixels: Pixels) -> Pixels:
-    new_pixels = newPixels(len(pixels), len(pixels[0]))
+    new_pixels = new_Pixels(len(pixels), len(pixels[0]))
     for row in range(len(pixels)):
         for col in range(len(pixels[row])):
             r = pixels[row][col][0]
@@ -83,11 +98,11 @@ def rgb_to_YCbCr(pixels: Pixels) -> Pixels:
             new_pixels[row][col][0] = y
             new_pixels[row][col][1] = cb
             new_pixels[row][col][2] = cr
-    return pixels
+    return new_pixels
 
 
 def YCbCr_to_rgb(pixels: Pixels) -> Pixels:
-    new_pixels = newPixels(len(pixels), len(pixels[0]))
+    new_pixels = new_Pixels(len(pixels), len(pixels[0]))
     for row in range(len(pixels)):
         for col in range(len(pixels[row])):
             y = pixels[row][col][0]
@@ -101,12 +116,12 @@ def YCbCr_to_rgb(pixels: Pixels) -> Pixels:
             new_pixels[row][col][0] = r
             new_pixels[row][col][1] = g
             new_pixels[row][col][2] = b
-    return pixels
+    return new_pixels
 
 
 def ppm_to_pixels(image: bytes) -> Pixels:
     s = image.split()
-    pixels = newPixels(s[2], s[1])
+    pixels = new_Pixels(s[2], s[1])
 
     if s[0] != b"P3":
         raise Exception("Only the P3 format is supported")

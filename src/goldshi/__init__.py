@@ -1,12 +1,22 @@
-from goldshi.photo import box_blur, brightness, pixels_to_ppm, ppm_to_pixels
+from goldshi.photo import (
+    YCbCr_to_rgb,
+    contrast,
+    pixels_to_ppm,
+    ppm_to_pixels,
+    rgb_to_YCbCr,
+)
 
 
 def main() -> None:
-    with open("/home/saubuny/Pictures/ppm/teto.ppm", "rb") as f:
+    with open("/home/saubuny/Pictures/ppm/tree.ppm", "rb") as f:
         image = f.read()
 
         try:
-            output = pixels_to_ppm(box_blur(ppm_to_pixels(image)))
+            output = ppm_to_pixels(image)
+            output = rgb_to_YCbCr(output)
+            output = contrast(output)
+            output = YCbCr_to_rgb(output)
+            output = pixels_to_ppm(output)
             with open("out", "wb") as out:
                 out.write(output)
         except Exception as e:
