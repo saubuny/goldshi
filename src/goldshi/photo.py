@@ -1,7 +1,7 @@
 from typing import List
 
-from goldshi.helper import clamp
 
+# TODO: use named tuples for better readability, as you can't tell which functions work on rgb or ycbcr...
 type Pixels = List[List[List[float]]]
 
 
@@ -9,6 +9,14 @@ def new_Pixels(row, col) -> Pixels:
     return [
         [[0.0 for _ in range(3)] for _ in range(int(col))] for _ in range(int(row))
     ]  # [row][column][channel]
+
+
+def clamp(n: float, min: float, max: float) -> float:
+    if n > max:
+        return max
+    if n < min:
+        return min
+    return n
 
 
 # gaussian blur too complex for my tiny little brain
@@ -156,3 +164,9 @@ def pixels_to_ppm(pixels: Pixels) -> bytes:
         image += "\n"
 
     return image.encode("utf-8")
+
+
+def resize(x: int, y: int, pixels: Pixels) -> Pixels: ...
+
+
+def mirror(pixels: Pixels, vert: bool = False) -> Pixels: ...
