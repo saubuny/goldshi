@@ -176,8 +176,8 @@ def pixels_to_ppm(pixels: Pixels) -> bytes:
 # i don't know how i came up with this but it somehow works
 # does not work for values above 2.0
 def resize_y(pixels: Pixels, y: int) -> Pixels:
-    new_pixels = new_Pixels(y, len(pixels))
-    scale_y = y / len(pixels[0])
+    new_pixels = new_Pixels(y, len(pixels[0]))
+    scale_y = y / len(pixels)
 
     new_row = 0
     inc = scale_y - 1
@@ -192,8 +192,32 @@ def resize_y(pixels: Pixels, y: int) -> Pixels:
             new_row += 1
         for col in range(len(pixels[0])):
             for ch in range(3):
+                print(col)
                 new_pixels[new_row][col][ch] = pixels[row][col][ch]
         new_row += 1
+        prev_dup = dup
+    return new_pixels
+
+
+def resize_x(pixels: Pixels, x: int) -> Pixels:
+    new_pixels = new_Pixels(len(pixels), x)
+    scale_x = x / len(pixels[0])
+
+    new_col = 0
+    inc = scale_x - 1
+    dup = inc
+    prev_dup = 0
+    for col in range(len(pixels[0])):
+        dup += inc
+        if floor(prev_dup) != floor(dup):
+            for row in range(len(pixels)):
+                for ch in range(3):
+                    new_pixels[row][new_col][ch] = pixels[row][col][ch]
+            new_col += 1
+        for row in range(len(pixels)):
+            for ch in range(3):
+                new_pixels[row][new_col][ch] = pixels[row][col][ch]
+        new_col += 1
         prev_dup = dup
     return new_pixels
 
