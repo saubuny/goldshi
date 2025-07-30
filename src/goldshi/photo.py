@@ -1,11 +1,11 @@
 from typing import List
+from math import floor
 
-
-# TODO: use named tuples for better readability, as you can't tell which functions work on rgb or ycbcr...
 type Pixels = List[List[List[float]]]
 
 
-def new_Pixels(row, col) -> Pixels:
+# confusing, but row  is y and col is x
+def new_Pixels(row: int, col: int) -> Pixels:
     return [
         [[0.0 for _ in range(3)] for _ in range(int(col))] for _ in range(int(row))
     ]  # [row][column][channel]
@@ -71,10 +71,7 @@ def brightness(pixels: Pixels, change: float) -> Pixels:
 
 # percentile stretching
 def contrast(pixels: Pixels, factor: float = 1) -> Pixels:
-    y_values = []
-    for row in pixels:
-        for col in row:
-            y_values.append(col[0])
+    y_values = [col[0] for row in pixels for col in row]
     min = y_values[percentile(2, y_values)]
     max = y_values[percentile(98, y_values)]
 
@@ -129,7 +126,7 @@ def YCbCr_to_rgb(pixels: Pixels) -> Pixels:
 
 def ppm_to_pixels(image: bytes) -> Pixels:
     s = image.split()
-    pixels = new_Pixels(s[2], s[1])
+    pixels = new_Pixels(int(s[2]), int(s[1]))
 
     if s[0] != b"P3":
         raise Exception("Only the P3 format is supported")
@@ -166,7 +163,39 @@ def pixels_to_ppm(pixels: Pixels) -> bytes:
     return image.encode("utf-8")
 
 
-def resize(x: int, y: int, pixels: Pixels) -> Pixels: ...
+# duplicate a pixel if the new value of adding scale - 1 to a growing value crosses a new integer
+# ex w/ 1.75 scale (75% increase)
+# 0 - 1.50 [2 * (scale-1)] dup
+# 1 - 2.25 dup
+# 2 - 3.00 dup
+# 3 - 3.75 don't dup
+# 4 - 4.50 dup
+# 5 - 5.25 dup
+# 6 - 6.00 dup
+# 7 - 6.75 don't dup
+# i don't know how i came up with this but it somehow works
+# does not work for values above 2.0
+def resize_y(pixels: Pixels, y: int) -> Pixels:
+    new_pixels = new_Pixels(y, len(pixels))
+    scale_y = y / len(pixels[0])
+
+    new_row = 0
+    inc = scale_y - 1
+    dup = inc
+    prev_dup = 0
+    for row in range(len(pixels)):
+        dup += inc
+        if floor(prev_dup) != floor(dup):
+            for col in range(len(pixels[0])):
+                for ch in range(3):
+                    new_pixels[new_row][col][ch] = pixels[row][col][ch]
+            new_row += 1
+        for col in range(len(pixels[0])):
+            for ch in range(3):
+                new_pixels[new_row][col][ch] = pixels[row][col][ch]
+        new_row += 1
+        prev_dup = dup
+    return new_pixels
 
 
 def mirror(pixels: Pixels, vert: bool = False) -> Pixels: ...
