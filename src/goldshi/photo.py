@@ -174,7 +174,7 @@ def pixels_to_ppm(pixels: Pixels) -> bytes:
 # 6 - 6.00 dup
 # 7 - 6.75 don't dup
 # i don't know how i came up with this but it somehow works
-# does not work for values above 2.0
+# TODO: combine resize_y and resize_x into one function somehow
 def resize_y(pixels: Pixels, y: int) -> Pixels:
     new_pixels = new_Pixels(y, len(pixels[0]))
     scale_y = y / len(pixels)
@@ -192,12 +192,16 @@ def resize_y(pixels: Pixels, y: int) -> Pixels:
             if ceil(prev_dup) != ceil(dup):
                 prev_dup = dup
                 continue
-        else:
-            if floor(prev_dup) != floor(dup):
+        elif floor(prev_dup) != floor(dup):
+            for _ in range(floor(dup) - floor(prev_dup)):
                 for col in range(len(pixels[0])):
                     for ch in range(3):
                         new_pixels[new_row][col][ch] = pixels[row][col][ch]
                 new_row += 1
+
+                # scales above 2 tend to cause index error
+                if new_row >= y:
+                    return new_pixels
         for col in range(len(pixels[0])):
             for ch in range(3):
                 new_pixels[new_row][col][ch] = pixels[row][col][ch]
@@ -206,6 +210,7 @@ def resize_y(pixels: Pixels, y: int) -> Pixels:
     return new_pixels
 
 
+# lots of repeated code, but must be in own function
 def resize_x(pixels: Pixels, x: int) -> Pixels:
     new_pixels = new_Pixels(len(pixels), x)
     scale_x = x / len(pixels[0])
