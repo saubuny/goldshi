@@ -19,9 +19,8 @@ def main() -> None:
         try:
             output = ppm_to_pixels(image)
             # output = rgb_to_YCbCr(output)
-            output = resize_y(output, 1000)
-            output = resize_x(output, 300)
-            # output = resize_x(output, 400)
+            output = resize_y(output, 420)
+            output = resize_x(output, 69)
             # output = YCbCr_to_rgb(output)
             output = pixels_to_ppm(output)
             with open("out", "wb") as out:

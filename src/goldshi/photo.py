@@ -182,31 +182,28 @@ def resize_y(pixels: Pixels, y: int) -> Pixels:
     if scale_y <= 0:
         raise Exception("Can not scale to a negative number")
 
+    def copy_row(new_row: int, row: int) -> int:
+        for col in range(len(pixels[0])):
+            for ch in range(3):
+                new_pixels[new_row][col][ch] = pixels[row][col][ch]
+        return new_row + 1
+
     new_row = 0
-    inc = scale_y - 1
-    dup = inc
     prev_dup = 0
+    dup = (scale_y - 1) * 2
     for row in range(len(pixels)):
-        dup += inc
         if scale_y < 1:
             if ceil(prev_dup) != ceil(dup):
                 prev_dup = dup
                 continue
         elif floor(prev_dup) != floor(dup):
             for _ in range(floor(dup) - floor(prev_dup)):
-                for col in range(len(pixels[0])):
-                    for ch in range(3):
-                        new_pixels[new_row][col][ch] = pixels[row][col][ch]
-                new_row += 1
-
-                # scales above 2 tend to cause index error
-                if new_row >= y:
+                new_row = copy_row(new_row, row)
+                if new_row >= y:  # avoid index error
                     return new_pixels
-        for col in range(len(pixels[0])):
-            for ch in range(3):
-                new_pixels[new_row][col][ch] = pixels[row][col][ch]
-        new_row += 1
+        new_row = copy_row(new_row, row)
         prev_dup = dup
+        dup += scale_y - 1
     return new_pixels
 
 
