@@ -1,5 +1,5 @@
 from typing import List
-from math import floor
+from math import ceil, floor
 
 type Pixels = List[List[List[float]]]
 
@@ -185,14 +185,18 @@ def resize_y(pixels: Pixels, y: int) -> Pixels:
     prev_dup = 0
     for row in range(len(pixels)):
         dup += inc
-        if floor(prev_dup) != floor(dup):
-            for col in range(len(pixels[0])):
-                for ch in range(3):
-                    new_pixels[new_row][col][ch] = pixels[row][col][ch]
-            new_row += 1
+        if scale_y < 1:
+            if ceil(prev_dup) != ceil(dup):
+                prev_dup = dup
+                continue
+        else:
+            if floor(prev_dup) != floor(dup):
+                for col in range(len(pixels[0])):
+                    for ch in range(3):
+                        new_pixels[new_row][col][ch] = pixels[row][col][ch]
+                new_row += 1
         for col in range(len(pixels[0])):
             for ch in range(3):
-                print(col)
                 new_pixels[new_row][col][ch] = pixels[row][col][ch]
         new_row += 1
         prev_dup = dup
@@ -209,11 +213,16 @@ def resize_x(pixels: Pixels, x: int) -> Pixels:
     prev_dup = 0
     for col in range(len(pixels[0])):
         dup += inc
-        if floor(prev_dup) != floor(dup):
-            for row in range(len(pixels)):
-                for ch in range(3):
-                    new_pixels[row][new_col][ch] = pixels[row][col][ch]
-            new_col += 1
+        if scale_x < 1:
+            if ceil(prev_dup) != ceil(dup):
+                prev_dup = dup
+                continue
+        else:
+            if floor(prev_dup) != floor(dup):
+                for row in range(len(pixels)):
+                    for ch in range(3):
+                        new_pixels[row][new_col][ch] = pixels[row][col][ch]
+                new_col += 1
         for row in range(len(pixels)):
             for ch in range(3):
                 new_pixels[row][new_col][ch] = pixels[row][col][ch]
