@@ -179,6 +179,9 @@ def resize_y(pixels: Pixels, y: int) -> Pixels:
     new_pixels = new_Pixels(y, len(pixels[0]))
     scale_y = y / len(pixels)
 
+    if scale_y <= 0:
+        raise Exception("Can not scale to a negative number")
+
     new_row = 0
     inc = scale_y - 1
     dup = inc
@@ -206,6 +209,9 @@ def resize_y(pixels: Pixels, y: int) -> Pixels:
 def resize_x(pixels: Pixels, x: int) -> Pixels:
     new_pixels = new_Pixels(len(pixels), x)
     scale_x = x / len(pixels[0])
+
+    if scale_x <= 0:
+        raise Exception("Can not scale to a non-positive number")
 
     new_col = 0
     inc = scale_x - 1
