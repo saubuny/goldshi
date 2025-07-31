@@ -1,3 +1,4 @@
+from types import FunctionType
 from typing import List
 from math import ceil, floor
 
@@ -192,16 +193,15 @@ def resize_y(pixels: Pixels, y: int) -> Pixels:
     prev_dup = 0
     dup = (scale_y - 1) * 2
     for row in range(len(pixels)):
-        if scale_y < 1:
-            if ceil(prev_dup) != ceil(dup):
-                prev_dup = dup
-                continue
+        if scale_y < 1 and ceil(prev_dup) != ceil(dup):
+            prev_dup = dup
+            dup += scale_y - 1
+            continue
         elif floor(prev_dup) != floor(dup):
             for _ in range(floor(dup) - floor(prev_dup)):
                 new_row = copy_row(new_row, row)
-                if new_row >= y:  # avoid index error
-                    return new_pixels
-        new_row = copy_row(new_row, row)
+        if new_row < y:  # avoid index error
+            new_row = copy_row(new_row, row)
         prev_dup = dup
         dup += scale_y - 1
     return new_pixels
