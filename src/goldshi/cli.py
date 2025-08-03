@@ -72,20 +72,23 @@ def cli():
             print(args.verbose)
         output = ppm_to_pixels(image)
 
-        if args.brightness:
-            output = brightness(output, args.brightness)
-        if args.grayscale:
-            output = grayscale(output)
-        if args.blur:
-            output = box_blur(output, args.blur)
-        if args.contrast:
-            output = rgb_to_YCbCr(output)
-            output = contrast(output, args.contrast)
-            output = YCbCr_to_rgb(output)
-        if args.mirror_horizontal:
-            output = mirror_horizontal(output)
-        if args.mirror_vertical:
-            output = mirror_vertical(output)
+        try:
+            if args.brightness:
+                output = brightness(output, args.brightness)
+            if args.grayscale:
+                output = grayscale(output)
+            if args.blur:
+                output = box_blur(output, args.blur)
+            if args.contrast:
+                output = rgb_to_YCbCr(output)
+                output = contrast(output, args.contrast)
+                output = YCbCr_to_rgb(output)
+            if args.mirror_horizontal:
+                output = mirror_horizontal(output)
+            if args.mirror_vertical:
+                output = mirror_vertical(output)
+        except Exception as e:
+            print(f"[Error] {e}")
 
         output = pixels_to_ppm(output)
         with open("out", "wb") as out:
