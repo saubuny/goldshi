@@ -4,8 +4,10 @@
 * [ ] Support for more image formats than uncompressed PPM
 
 ## Usage
-TODO!!
+```bash
+uv run goldshi [image] [options]
+```
 
 ## Why
-This is simply a project to get me back into programming after a long hiatus. I wanted something fun, sizeable, and that I might actually use occasionally.
+This is simply a project to get me back into programming after a long hiatus. I wanted something fun, sizeable, and that I might actually use occasionally. I'm too lazy to upload it somewhere.
 
