@@ -72,7 +72,7 @@ def brightness(pixels: Pixels, change: float) -> Pixels:
 # percentile stretching
 def contrast(pixels: Pixels, factor: float = 1) -> Pixels:
     y_values = [col[0] for row in pixels for col in row]
-    min = y_values[percentile(2, y_values)]
+    min = y_values[percentile(6, y_values)]
     max = y_values[percentile(98, y_values)]
 
     for row in range(len(pixels)):
@@ -218,19 +218,15 @@ def resize(pixels: Pixels, x: int, y: int) -> Pixels:
     return new_pixels
 
 
-# does rotation too
-# left = transpose
-# right = transpose + mirror_vertically
 def mirror_vertical(pixels: Pixels) -> Pixels:
     y = len(pixels)
     x = len(pixels[0])
     new_pixels = new_Pixels(y, x)
-    for row in range(y):
+    for _ in range(y):
         new_pixels = list(reversed(pixels))
     return new_pixels
 
 
-# flip all columns
 def mirror_horizontal(pixels: Pixels) -> Pixels:
     y = len(pixels)
     x = len(pixels[0])

@@ -2,14 +2,6 @@
 
 ## Planned Features
 * [ ] Support for more image formats than uncompressed PPM
-* [x] Resizing
-* [ ] Mirror
-* [ ] Rotate
-* [x] Blur
-* [x] Color Manipulation
-    * [x] Grayscale
-    * [x] Brightness
-    * [x] Contrast
 
 ## Usage
 TODO!!
