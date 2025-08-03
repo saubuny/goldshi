@@ -164,7 +164,7 @@ def pixels_to_ppm(pixels: Pixels) -> bytes:
 
 
 # transpose list: [row][col][ch] ↔ [col][row][ch]
-def rotate(pixels: Pixels) -> Pixels:
+def transpose(pixels: Pixels) -> Pixels:
     new_pixels = new_Pixels(len(pixels[0]), len(pixels))
     for row in range(len(pixels)):
         for col in range(len(pixels[row])):
@@ -213,9 +213,29 @@ def resize_y(pixels: Pixels, y: int) -> Pixels:
 
 
 def resize(pixels: Pixels, x: int, y: int) -> Pixels:
-    new_pixels = rotate(resize_y(pixels, y))
-    new_pixels = rotate(resize_y(new_pixels, x))
+    new_pixels = transpose(resize_y(pixels, y))
+    new_pixels = transpose(resize_y(new_pixels, x))
     return new_pixels
 
 
-def mirror(pixels: Pixels, vert: bool = False) -> Pixels: ...
+# does rotation too
+# left = transpose
+# right = transpose + mirror_vertically
+def mirror_vertical(pixels: Pixels) -> Pixels:
+    y = len(pixels)
+    x = len(pixels[0])
+    new_pixels = new_Pixels(y, x)
+    for row in range(y):
+        new_pixels = list(reversed(pixels))
+    return new_pixels
+
+
+# flip all columns
+def mirror_horizontal(pixels: Pixels) -> Pixels:
+    y = len(pixels)
+    x = len(pixels[0])
+    new_pixels = new_Pixels(y, x)
+    for row in range(y):
+        for _ in range(x):
+            new_pixels[row] = list(reversed(pixels[row]))
+    return new_pixels

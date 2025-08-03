@@ -2,7 +2,7 @@
 
 ## Planned Features
 * [ ] Support for more image formats than uncompressed PPM
-* [ ] Resizing
+* [x] Resizing
 * [ ] Mirror
 * [ ] Rotate
 * [x] Blur
