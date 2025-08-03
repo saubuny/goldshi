@@ -182,8 +182,6 @@ def rotate(pixels: Pixels) -> Pixels:
 # 5 - 5.25 dup
 # 6 - 6.00 dup
 # 7 - 6.75 don't dup
-# i don't know how i came up with this but it somehow works
-# rotating the image before and after has the same effect as resizing on x
 def resize_y(pixels: Pixels, y: int) -> Pixels:
     new_pixels = new_Pixels(y, len(pixels[0]))
     scale_y = y / len(pixels)
@@ -211,6 +209,12 @@ def resize_y(pixels: Pixels, y: int) -> Pixels:
         new_row = copy_row(new_row, row)
         prev_dup = dup
         dup += scale_y - 1
+    return new_pixels
+
+
+def resize(pixels: Pixels, x: int, y: int) -> Pixels:
+    new_pixels = rotate(resize_y(pixels, y))
+    new_pixels = rotate(resize_y(new_pixels, x))
     return new_pixels
 
 
