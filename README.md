@@ -4,6 +4,7 @@
 * [ ] Support for more image formats than uncompressed PPM
 * [ ] Resizing
 * [ ] Mirror
+* [ ] Rotate
 * [x] Blur
 * [x] Color Manipulation
     * [x] Grayscale

@@ -1,4 +1,3 @@
-from types import FunctionType
 from typing import List
 from math import ceil, floor
 
@@ -164,6 +163,10 @@ def pixels_to_ppm(pixels: Pixels) -> bytes:
     return image.encode("utf-8")
 
 
+# transpose list: [row][col][ch] ↔ [col][row][ch]
+def rotate(pixels: Pixels) -> Pixels: ...
+
+
 # duplicate a pixel if the new value of adding scale - 1 to a growing value crosses a new integer
 # ex w/ 1.75 scale (75% increase)
 # 0 - 1.50 [2 * (scale-1)] dup
@@ -175,7 +178,7 @@ def pixels_to_ppm(pixels: Pixels) -> bytes:
 # 6 - 6.00 dup
 # 7 - 6.75 don't dup
 # i don't know how i came up with this but it somehow works
-# TODO: combine resize_y and resize_x into one function somehow
+# rotating the image before and after has the same effect as resizing on x
 def resize_y(pixels: Pixels, y: int) -> Pixels:
     new_pixels = new_Pixels(y, len(pixels[0]))
     scale_y = y / len(pixels)
@@ -190,8 +193,8 @@ def resize_y(pixels: Pixels, y: int) -> Pixels:
         return new_row + 1
 
     new_row = 0
-    prev_dup = 0
-    dup = (scale_y - 1) * 2
+    prev_dup = scale_y - 1
+    dup = prev_dup * 2
     for row in range(len(pixels)):
         if scale_y < 1 and ceil(prev_dup) != ceil(dup):
             prev_dup = dup
@@ -200,42 +203,9 @@ def resize_y(pixels: Pixels, y: int) -> Pixels:
         elif floor(prev_dup) != floor(dup):
             for _ in range(floor(dup) - floor(prev_dup)):
                 new_row = copy_row(new_row, row)
-        if new_row < y:  # avoid index error
-            new_row = copy_row(new_row, row)
+        new_row = copy_row(new_row, row)
         prev_dup = dup
         dup += scale_y - 1
-    return new_pixels
-
-
-# lots of repeated code, but must be in own function
-def resize_x(pixels: Pixels, x: int) -> Pixels:
-    new_pixels = new_Pixels(len(pixels), x)
-    scale_x = x / len(pixels[0])
-
-    if scale_x <= 0:
-        raise Exception("Can not scale to a non-positive number")
-
-    new_col = 0
-    inc = scale_x - 1
-    dup = inc
-    prev_dup = 0
-    for col in range(len(pixels[0])):
-        dup += inc
-        if scale_x < 1:
-            if ceil(prev_dup) != ceil(dup):
-                prev_dup = dup
-                continue
-        else:
-            if floor(prev_dup) != floor(dup):
-                for row in range(len(pixels)):
-                    for ch in range(3):
-                        new_pixels[row][new_col][ch] = pixels[row][col][ch]
-                new_col += 1
-        for row in range(len(pixels)):
-            for ch in range(3):
-                new_pixels[row][new_col][ch] = pixels[row][col][ch]
-        new_col += 1
-        prev_dup = dup
     return new_pixels
 
 

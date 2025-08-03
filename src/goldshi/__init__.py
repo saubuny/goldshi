@@ -5,7 +5,6 @@ from goldshi.photo import (
     grayscale,
     pixels_to_ppm,
     ppm_to_pixels,
-    resize_x,
     resize_y,
     rgb_to_YCbCr,
 )
@@ -19,7 +18,8 @@ def main() -> None:
         try:
             output = ppm_to_pixels(image)
             # output = rgb_to_YCbCr(output)
-            output = resize_y(output, 20)
+            output = resize_y(output, int(194 * 10))
+            # output = resize(output, 1080, True)
             # output = YCbCr_to_rgb(output)
             output = pixels_to_ppm(output)
             with open("out", "wb") as out:
