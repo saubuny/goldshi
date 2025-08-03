@@ -164,7 +164,12 @@ def pixels_to_ppm(pixels: Pixels) -> bytes:
 
 
 # transpose list: [row][col][ch] ↔ [col][row][ch]
-def rotate(pixels: Pixels) -> Pixels: ...
+def rotate(pixels: Pixels) -> Pixels:
+    new_pixels = new_Pixels(len(pixels[0]), len(pixels))
+    for row in range(len(pixels)):
+        for col in range(len(pixels[row])):
+            new_pixels[col][row] = pixels[row][col]
+    return new_pixels
 
 
 # duplicate a pixel if the new value of adding scale - 1 to a growing value crosses a new integer
